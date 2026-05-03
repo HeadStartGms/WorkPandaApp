@@ -1,0 +1,7 @@
+{
+  "dart.flutterSdkPath": "/Users/sureshkumar/development/flutter",
+  "dart.sdkPath": "/Users/sureshkumar/development/flutter/bin/cache/dart-sdk",
+  "terminal.integrated.env.osx": {
+    "PATH": "/Users/sureshkumar/development/flutter/bin:/usr/local/bin:\${env:PATH}"
+  }
+}
