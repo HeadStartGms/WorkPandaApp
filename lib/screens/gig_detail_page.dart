@@ -300,9 +300,10 @@ class _GigDetailPageState extends ConsumerState<GigDetailPage> {
   }
 
   Widget _paymentBreakdown(Gig gig) {
-    final platform = gig.budget * 0.02;
-    final gateway = gig.budget * 0.02;
-    final workerPay = gig.budget - platform - gateway;
+    final int budgetInt = gig.budget.round();
+    final int platform = (gig.budget * 0.02).round();
+    final int gateway = (gig.budget * 0.02).round();
+    final int workerPay = budgetInt - platform - gateway;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -316,14 +317,14 @@ class _GigDetailPageState extends ConsumerState<GigDetailPage> {
           Text('PAYMENT BREAKDOWN',
               style: WPTheme.label(11, color: WPTheme.white)),
           const SizedBox(height: 14),
-          _payRow('Total Budget', '₹${gig.budget.toStringAsFixed(0)}',
+          _payRow('Total Budget', '₹$budgetInt',
               color: WPTheme.white),
-          _payRow('Platform Fee (2%)', '- ₹${platform.toStringAsFixed(0)}',
+          _payRow('Platform Fee (2%)', '- ₹$platform',
               color: WPTheme.midGrey),
-          _payRow('Gateway Fee (2%)', '- ₹${gateway.toStringAsFixed(0)}',
+          _payRow('Gateway Fee (2%)', '- ₹$gateway',
               color: WPTheme.midGrey),
           const Divider(color: Color(0xFF333333), height: 20),
-          _payRow('You Receive', '₹${workerPay.toStringAsFixed(0)}',
+          _payRow('You Receive', '₹$workerPay',
               color: WPTheme.bambooLight, bold: true),
         ],
       ),

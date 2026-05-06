@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'theme/app_theme.dart';
 import 'widgets/components.dart';
+import 'widgets/premium_components.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth_screen.dart';
@@ -48,7 +49,7 @@ class WorkPandaApp extends StatelessWidget {
     return MaterialApp(
       title: 'WorkPanda',
       debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(),
+      theme: AppTheme.darkTheme,
       home: const AppShell(),
     );
   }
@@ -127,100 +128,48 @@ class _MainNavState extends ConsumerState<MainNav> {
     final selectedIndex = _getNavIndex(navState.currentDestination);
 
     return Scaffold(
-      backgroundColor: WPTheme.white,
+      backgroundColor: const Color(0xFF0A0A0A), // Apply pure black background
       body: Stack(
         children: [
-          _buildScreen(navState.currentDestination, ref),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0.0, 0.05),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
+                ),
+              );
+            },
+            child: Container(
+              key: ValueKey<NavDestination>(navState.currentDestination),
+              child: _buildScreen(navState.currentDestination, ref),
+            ),
+          ),
           if (navState.activeOverlay != null)
             _buildOverlay(navState.activeOverlay!, navState.overlayData, ref),
         ],
       ),
-      floatingActionButton: _buildFAB(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: _buildBottomNav(selectedIndex),
-    );
-  }
-
-  Widget _buildFAB() {
-    return GestureDetector(
-      onTap: _onFabTap,
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: WPTheme.black,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: WPTheme.black.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: const Icon(Icons.add, color: WPTheme.white, size: 28),
+      bottomNavigationBar: GlassBottomNav(
+        currentIndex: selectedIndex == 2 ? -1 : selectedIndex,
+        onTap: (index) {
+          if (index == 2) {
+            _onFabTap();
+          } else {
+            HapticFeedback.selectionClick();
+            ref.read(navigationProvider.notifier).setDestination(_getNavDest(index));
+          }
+        },
       ),
     );
   }
 
-  Widget _buildBottomNav(int currentIndex) {
-    return Container(
-      decoration: BoxDecoration(
-        color: WPTheme.white,
-        border: Border(top: BorderSide(color: WPTheme.lightGrey, width: 1)),
-      ),
-      child: SafeArea(
-        child: SizedBox(
-          height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(Icons.grid_view_rounded, 0, currentIndex),
-              _navItem(Icons.explore_outlined, 1, currentIndex),
-              const SizedBox(width: 60), // FAB space
-              _navItem(Icons.account_balance_wallet_outlined, 3, currentIndex),
-              _navItem(Icons.person_outline_rounded, 4, currentIndex),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Removed old _buildFAB, _buildBottomNav, and _navItem
 
-  Widget _navItem(IconData icon, int targetIndex, int currentIndex) {
-    final active = targetIndex == currentIndex;
-
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        ref.read(navigationProvider.notifier).setDestination(_getNavDest(targetIndex));
-      },
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 56,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: active ? WPTheme.black : WPTheme.midGrey,
-              size: 24,
-            ),
-            if (active)
-              Container(
-                margin: const EdgeInsets.only(top: 4),
-                width: 4,
-                height: 4,
-                decoration: const BoxDecoration(
-                  color: WPTheme.black,
-                  shape: BoxShape.circle,
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
 
   int _getNavIndex(NavDestination dest) {
     switch (dest) {

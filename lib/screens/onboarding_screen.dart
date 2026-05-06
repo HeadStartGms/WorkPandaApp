@@ -79,7 +79,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 60),
-                Image.asset('assets/images/download.gif', width: 280),
+                Image.asset('assets/images/panda_logo.png', width: 280),
                 const SizedBox(height: 40),
               ],
             ),
@@ -232,7 +232,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             flex: 4,
             child: Center(
-                child: Image.asset('assets/images/download.gif', width: 260)),
+                child: Image.asset('assets/images/panda_logo.png', width: 260)),
           ),
           Expanded(
             flex: 6,

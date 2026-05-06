@@ -140,42 +140,19 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: _filters.length,
-          itemBuilder: (ctx, i) {
+          itemBuilder: (BuildContext ctx, int i) {
             final f = _filters[i];
             final isSelected = f['label'] == _selectedFilter;
-            return GestureDetector(
+            return _HoverableFilterChip(
+              key: ValueKey(f['label'] as String),
+              filter: f,
+              isSelected: isSelected,
               onTap: () {
                 HapticFeedback.selectionClick();
                 setState(() {
-                  _selectedFilter = f['label'];
+                  _selectedFilter = f['label'] as String;
                 });
               },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected ? WPTheme.black : Colors.transparent,
-                  border: Border.all(
-                    color: isSelected ? WPTheme.black : WPTheme.lightGrey,
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Row(
-                  children: [
-                    Icon(f['icon'] as IconData,
-                        size: 14,
-                        color: isSelected ? WPTheme.white : WPTheme.darkGrey),
-                    const SizedBox(width: 6),
-                    Text(
-                      (f['label'] as String).toUpperCase(),
-                      style: WPTheme.label(11,
-                          color: isSelected ? WPTheme.white : WPTheme.darkGrey),
-                    ),
-                  ],
-                ),
-              ),
             );
           },
         ),
@@ -327,5 +304,118 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   String _fmt(double b) {
     if (b >= 1000) return '${(b / 1000).toStringAsFixed(1)}k';
     return b.toStringAsFixed(0);
+  }
+}
+
+class _HoverableFilterChip extends StatefulWidget {
+  final Map<String, dynamic> filter;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _HoverableFilterChip({
+    super.key,
+    required this.filter,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_HoverableFilterChip> createState() => _HoverableFilterChipState();
+}
+
+class _HoverableFilterChipState extends State<_HoverableFilterChip>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _sweep;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
+    _sweep = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutQuart);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        _ctrl.forward();
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        _ctrl.reverse();
+      },
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          margin: const EdgeInsets.only(right: 8),
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: widget.isSelected ? WPTheme.black : Colors.transparent,
+            border: Border.all(
+              color: widget.isSelected ? WPTheme.black : WPTheme.lightGrey,
+              width: 1.5,
+            ),
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Smooth left-to-right sweep (enter) and left-to-right vanish (exit)
+              if (!widget.isSelected)
+                Positioned.fill(
+                  child: AnimatedBuilder(
+                    animation: _sweep,
+                    builder: (context, _) {
+                      return Align(
+                        // centerLeft → fills from left on enter
+                        // centerRight → shrinks from left on exit (vanishes L→R)
+                        alignment: _isHovered
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight,
+                        child: FractionallySizedBox(
+                          widthFactor: _sweep.value,
+                          child: Container(color: WPTheme.lightGrey),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+              // Content stays on top
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(widget.filter['icon'] as IconData,
+                        size: 14,
+                        color: widget.isSelected ? WPTheme.white : WPTheme.darkGrey),
+                    const SizedBox(width: 6),
+                    Text(
+                      (widget.filter['label'] as String).toUpperCase(),
+                      style: WPTheme.label(11,
+                          color: widget.isSelected ? WPTheme.white : WPTheme.darkGrey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

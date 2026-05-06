@@ -395,13 +395,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: WPTheme.urgencyColor(gig.urgency).withOpacity(0.12),
+                      color: gig.urgency == 'Low'
+                          ? const Color(0xFFD9F99D)
+                          : WPTheme.urgencyColor(gig.urgency).withOpacity(0.12),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: Text(
                       gig.urgency.toUpperCase(),
                       style: WPTheme.label(9,
-                          color: WPTheme.urgencyColor(gig.urgency)),
+                          color: gig.urgency == 'Low'
+                              ? const Color(0xFF166534)
+                              : WPTheme.urgencyColor(gig.urgency)),
                     ),
                   ),
                 ],

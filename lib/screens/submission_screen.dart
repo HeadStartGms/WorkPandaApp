@@ -140,16 +140,17 @@ class _SubmissionScreenState extends State<SubmissionScreen> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.offWhite,
+            color: AppColors.black,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.silver),
           ),
           child: TextField(
             maxLines: 4,
+            style: const TextStyle(color: AppColors.white),
             decoration: InputDecoration(
               hintText: 'Describe your submission...',
               hintStyle: AppTextStyles.bodyMedium
-                  .copyWith(color: AppColors.slate.withValues(alpha: 0.5)),
+                  .copyWith(color: AppColors.white.withValues(alpha: 0.4)),
               border: InputBorder.none,
             ),
           ),

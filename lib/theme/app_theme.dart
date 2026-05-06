@@ -84,3 +84,37 @@ ThemeData buildAppTheme() {
     ),
   );
 }
+
+class AppTheme {
+  static ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    scaffoldBackgroundColor: const Color(0xFF0A0A0A),
+
+    colorScheme: const ColorScheme.dark(
+      primary: Colors.white,
+      secondary: Color(0xFF6366F1), // subtle accent
+    ),
+
+    textTheme: const TextTheme(
+      headlineMedium: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      bodyMedium: TextStyle(fontSize: 14, color: Color(0xFFA1A1AA)),
+    ),
+
+    cardTheme: CardThemeData(
+      color: const Color(0xFF121212),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
+
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: const Color(0xFF1A1A1A),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30),
+        borderSide: BorderSide.none,
+      ),
+    ),
+  );
+}
